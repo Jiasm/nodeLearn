@@ -4,7 +4,7 @@ var express = require("express"),
 	multipart = require('connect-multiparty'),
 	multipartMiddleware = multipart(),
 	app = express();
-app.use(bodyParser({ keepExtensions: true, uploadDir: './' }));
+//app.use(bodyParser({ keepExtensions: true, uploadDir: './' }));
 app.get("/", (req, res) => {
 	res.send(`
 		<!DOCTYPE html>
@@ -15,6 +15,7 @@ app.get("/", (req, res) => {
 		</head>
 		<body>
 			<form action="/" method="post" enctype="multipart/form-data">
+				<input name="name" value="niko"/>
 				<input type="file" name="myFile" multiple/>	
 				<button>upload this file</button>
 			</form>
