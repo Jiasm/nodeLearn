@@ -1,8 +1,8 @@
 "use strict";
-var express = require("express"),
-    bodyParser = require("body-parser"),	// 用来获取post参数
-    mongodb = require("mongodb"),
-    app = express();
+var app = require("express")(),
+    bodyParser = require("body-parser"),			// 用来获取post参数
+    MongoClient = require("mongodb").MongoClient,	// 连接mongoDB数据库
+    url = "mongodb://localhost:27017/submit120";
 app.set("view engine", "ejs");
 app.set("views", __dirname);
 app.use(bodyParser.urlencoded({
@@ -18,11 +18,45 @@ app.post("/reg", (req, res) => {
     var params = req.body,
         username = params.username,
         password = params.password;
-    console.log(`
-		username: ${username}
-		password: ${password}
-	`);
-    res.send("");
+    MongoClient.connect(url, (err, db) => {
+    	if (err) {
+			res.send(err);
+    	} else {
+    		db.collection("inserts").insertOne({
+    			name: username,
+    			pass: password
+    		}, (err, r) => {
+    			db.close();
+    			if (err) {
+    				res.send(err);
+    			} else {
+    				res.render("index");
+    			}
+    		})
+    	}
+    })
+})
+app.post("/", (req, res) => {
+    var params = req.body,
+        username = params.username,
+        password = params.password;
+    MongoClient.connect(url, (err, db) => {
+    	if (err) {
+			res.send(err);
+    	} else {
+    		db.collection("inserts").find({
+    			name: username,
+    			pass: password
+    		}).toArray((err, items) => {
+    			db.close();
+    			if (items.length) {
+    				res.send(`欢迎：${items[0].name}`);
+    			} else {
+    				res.send("账号或密码错误");
+    			}
+    		})
+    	}
+    })
 })
 app.listen(233, () => {
     console.log("run as 233");
